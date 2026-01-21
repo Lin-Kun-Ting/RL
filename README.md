@@ -1,0 +1,1 @@
+This work implements the algorithms presented in [Reinforcement Learning: An Introduction (Second Edition)](https://www.amazon.com/Reinforcement-Learning-Introduction-Adaptive-Computation/dp/0262039249).
