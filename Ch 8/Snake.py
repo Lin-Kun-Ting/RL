@@ -12,6 +12,7 @@ class SnakeGame():
         self.eaten = 0
         self.directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
         self.steps = 0
+        self.maxSteps = height * width
         self.terminate = False
     def takeAction(self, action):
         self.prevAction = action
@@ -29,16 +30,16 @@ class SnakeGame():
                 self.food = None
                 self.terminate = True
             self.eaten += 1
-            return 100
-        elif (nx, ny) not in self.emptyGrid:
+            return self.maxSteps ** 2 / 2
+        elif (nx, ny) not in self.emptyGrid or self.steps == self.maxSteps:
             self.terminate = True
-            return -1000
+            return -self.maxSteps ** 3 / 2
         else:
             self.steps += 1
             self.snake.insert(0, (nx, ny))
             self.emptyGrid.remove((nx, ny))
             self.emptyGrid.append(self.snake.pop())
-            return -abs(nx - self.food[0]) - abs(ny - self.food[1])
+            return - abs(nx - self.food[0]) - abs(ny - self.food[1])
     def decideAction(self, Q, state, epsilon):
         if not Q.get(state):
             Q[state] = dict()
@@ -83,7 +84,7 @@ while not agent.terminate:
         
         # Draw snake
         for i, segment in enumerate(agent.snake):
-            pygame.draw.rect(screen, (0, 255 - i * 8, 0), (segment[1] * CELL_SIZE, segment[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+            pygame.draw.rect(screen, (0, max(255 - i * 8, 0), 0), (segment[1] * CELL_SIZE, segment[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
         
         # Draw food
         pygame.draw.rect(screen, (255, 0, 0), (agent.food[1] * CELL_SIZE, agent.food[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
@@ -110,7 +111,7 @@ for t in range(T + 1):
             clock = pygame.time.Clock()
             
             while not agent.terminate:
-                currAction = agent.decideAction(Q, currState, 1 / (t + 1))
+                currAction = agent.decideAction(Q, currState, -1)
                 reward = agent.takeAction(currAction)
                 nextState = tuple(agent.snake), agent.food
                 optimalAction = agent.decideAction(Q, nextState, -1)
@@ -121,7 +122,7 @@ for t in range(T + 1):
                 
                 # Draw snake
                 for i, segment in enumerate(agent.snake):
-                    pygame.draw.rect(screen, (0, 255 - i * 8, 0), (segment[1] * CELL_SIZE, segment[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+                    pygame.draw.rect(screen, (0, max(255 - i * 8, 0), 0), (segment[1] * CELL_SIZE, segment[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
                 
                 # Draw food
                 if agent.food != None:
