@@ -1,4 +1,5 @@
 import random
+import math
 import pygame
 class SnakeGame():
     def __init__(self, height = 5, width = 5, seed = 1115):
@@ -51,12 +52,14 @@ class SnakeGame():
             return random.choice([num for num in range(4)])
         else:
             # greedy
-            maxQ = -1e6
+            maxQ = -math.inf
             for action in range(4):
                 if Q[state][action] > maxQ:
                     maxQ = Q[state][action]
-                    optimalAction = action
-            return optimalAction
+                    optimalAction = [action]
+                elif Q[state][action] == maxQ:
+                    optimalAction.append(action)
+            return random.choice(optimalAction)
 agent = SnakeGame()
 while not agent.terminate:
     pygame.init()
@@ -94,7 +97,7 @@ while not agent.terminate:
     
     pygame.quit()
 
-T = 1500
+T = 1000
 epsilon = 0.1
 alpha = 0.5
 Q = {}
